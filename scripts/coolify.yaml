@@ -1,0 +1,30 @@
+cloud_final_modules:
+ - scripts-per-once
+packages:
+  - fail2ban
+  - ufw
+package_update: true
+package_upgrade: true
+write_files:
+  - content: |
+      #!/bin/bash
+      curl -fsSL https://cdn.coollabs.io/coolify/install.sh -o /tmp/install.sh
+      chmod +x /tmp/install.sh
+      /tmp/install.sh
+    path: /var/lib/cloud/scripts/per-once/install.sh
+    permissions: "0755"
+runcmd:
+  - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
+  - systemctl enable fail2ban
+  - ufw allow OpenSSH
+  - ufw enable
+  - sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin yes/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)ChallengeResponseAuthentication/s/^.*$/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)MaxAuthTries/s/^.*$/MaxAuthTries 2/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AllowTcpForwarding/s/^.*$/AllowTcpForwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
+  - reboot
