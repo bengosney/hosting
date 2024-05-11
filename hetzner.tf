@@ -43,10 +43,15 @@ resource "hcloud_firewall" "webfirewall" {
   }
 }
 
+variable "ssh_key" {
+  description = "SSH public key"
+}
+
 data "template_file" "user_data" {
   template = file("./scripts/user-data.yaml")
   vars = {
-    domain = var.domain
+    domain  = var.domain,
+    ssh_key = var.ssh_key
   }
 }
 
@@ -70,7 +75,7 @@ resource "hcloud_server" "web" {
   }
 
   public_net {
-    ipv4_enabled = false
+    ipv4_enabled = true
     ipv6_enabled = true
   }
 }

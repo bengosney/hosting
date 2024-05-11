@@ -5,7 +5,7 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLllV9aj4mFlbgrJTL550gTtBcrxnXP0V/9nI5rgBoZDFIWSHTYHimq9iT87QGjDd/HO16c1EPpnUbq7MilwUiAhadtbzrnCd3tyEJ8EGWRs6CWXIFqKY4Zi8uguWR3xh+u2osfxmfFKQg32iZtez8o5gHETfIQrBP5lH5U8m7idQAH7iNW+/4dLHDwKV5m6wuzPuxG4cVZ4LwID2qL4mynuZrAxwhrrW0LLwmn3gVXLpCs8Iv8xIPkuZQpNvDD1V+oCcb4nwI7AQfPQoaTTMtZbHt83c7m5uKjLSBu5v5FfijpbonmvRKDbNXTbFf4wlK7WGAnxmxPMWfBA+twdNVyJJvlIm+AAnB87DsRlwJ4kvL5gcfAgEFcNqxjaQLA373X8vyW34Lau55wu/MjpzQTzQ921saSEDNsRD/yTFQtI4Z43udrWPvtpL4SL5tglGZdNcL6/1OAriwNzuudtoFXk5GEEbTtItnF7guTfbsUNKN78KVW2rxtcdbjMV77CE= ben@ben-Inspiron-3542
+      - ${ssh_key}
 cloud_final_modules:
  - scripts-per-once
 packages:
