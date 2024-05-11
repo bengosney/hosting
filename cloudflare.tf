@@ -38,7 +38,7 @@ resource "tls_cert_request" "origin_cert" {
 
   subject {
     common_name  = ""
-    organization = "www.${var.domain}"
+    organization = "hosting.${var.domain}"
   }
 }
 
@@ -48,17 +48,4 @@ resource "cloudflare_origin_ca_certificate" "origin_cert" {
   request_type         = "origin-rsa"
   requested_validity   = 5475
   min_days_for_renewal = 365
-}
-
-resource "cloudflare_page_rule" "non-www-to-www" {
-  priority = 1
-  status   = "active"
-  target   = "${var.domain}/*"
-  zone_id  = var.zoneid
-  actions {
-    forwarding_url {
-      status_code = 301
-      url         = "https://www.${var.domain}/$1"
-    }
-  }
 }
