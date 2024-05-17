@@ -41,6 +41,15 @@ resource "hcloud_firewall" "webfirewall" {
       "::/0"
     ]
   }
+
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "22"
+    source_ips = [
+      "84.92.61.77/32",
+    ]
+  }
 }
 
 variable "ssh_key" {

@@ -11,8 +11,8 @@ variable "zoneid" {
   description = "Cloudflare zone ID"
 }
 
-resource "cloudflare_record" "hosting" {
-  name            = "hosting"
+resource "cloudflare_record" "dokku-ipv6" {
+  name            = "@"
   proxied         = true
   type            = "AAAA"
   value           = hcloud_server.web.ipv6_address
@@ -20,11 +20,20 @@ resource "cloudflare_record" "hosting" {
   allow_overwrite = true
 }
 
-resource "cloudflare_record" "root" {
-  name            = var.domain
+resource "cloudflare_record" "dokku-ipv4" {
+  name            = "@"
   proxied         = true
-  type            = "CNAME"
-  value           = "hosting.${var.domain}"
+  type            = "A"
+  value           = hcloud_server.web.ipv4_address
+  zone_id         = var.zoneid
+  allow_overwrite = true
+}
+
+resource "cloudflare_record" "ssh" {
+  name            = "ssh"
+  proxied         = false
+  type            = "A"
+  value           = hcloud_server.web.ipv4_address
   zone_id         = var.zoneid
   allow_overwrite = true
 }

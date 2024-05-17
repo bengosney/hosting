@@ -12,30 +12,14 @@ packages:
   - openssh-server
   - fail2ban
   - ufw
-  - nginx
+  - git
+  - python3-pip
 package_update: true
 package_upgrade: true
-write_files:
-  - content: |
-      #!/bin/bash
-      curl -fsSL https://cdn.coollabs.io/coolify/install.sh -o /tmp/install.sh
-      chmod +x /tmp/install.sh
-      /tmp/install.sh
-    path: /var/lib/cloud/scripts/per-once/install.sh
-    permissions: "0755"
-  - path: /etc/nginx/sites-available/hosting.conf
-    content: |
-      server {
-        listen 80;
-        listen [::]:80;
-
-        server_name hosting.${domain};
-
-        location / {
-            proxy_pass http://localhost:8000;
-            include proxy_params;
-        }
-      }
+ansible:
+  install_method: pip
+  galaxy:
+    - role dokku_bot.ansible_dokku
 runcmd:
   - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
   - systemctl enable fail2ban
