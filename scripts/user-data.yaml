@@ -45,7 +45,16 @@ write_files:
       echo "Setting up Dokku domains"
       dokku domains:set-global ${domain}
 
+      echo "Adding Dokku plugins"
+      dokku plugin:install https://github.com/dokku/dokku-postgres.git
+      dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+      dokku letsencrypt:cron-job --add  # To auto-renew SSL certificates
+
+      echo "Setting up lets encrypt"
+      dokku letsencrypt:set --global email "${email}"
+
       echo "Finished Dokku setup"
+      sudo shutdown -r now
     path: /var/lib/cloud/scripts/per-once/install.sh
     permissions: "0755"
 runcmd:

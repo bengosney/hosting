@@ -12,6 +12,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4.0"
     }
+    dokku = {
+      source  = "aliksend/dokku"
+      version = "~> 1.0.14"
+    }
   }
 
   backend "s3" {
@@ -21,4 +25,8 @@ terraform {
 
 variable "domain" {
   description = "Domain (no www)"
+}
+
+variable "email" {
+  description = "Email address"
 }

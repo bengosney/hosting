@@ -61,6 +61,7 @@ data "template_file" "user_data" {
   vars = {
     domain  = var.domain,
     ssh_key = var.ssh_key
+    email   = var.email
   }
 }
 
