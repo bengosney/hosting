@@ -1,7 +1,0 @@
----
-- hosts: all
-  become: yes
-  become_user: root
-  become_method: sudo
-  roles:
-    - dokku_bot.ansible_dokku
