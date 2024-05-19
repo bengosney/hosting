@@ -16,47 +16,12 @@ packages:
   - python3-pip
 package_update: true
 package_upgrade: true
-write_files:
-  - content: |
-      #!/bin/bash
-      for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-      # Add Docker's official GPG key:
-      sudo apt-get update
-      sudo apt-get install ca-certificates curl
-      sudo install -m 0755 -d /etc/apt/keyrings
-      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-      sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-      # Add the repository to Apt sources:
-      echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-      sudo apt-get update
-      sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-      wget -NP /tmp/ https://dokku.com/install/v0.34.4/bootstrap.sh
-      sed -i '/log-fail.*SUPPORTED_VERSIONS/c\echo "unsupported"' /tmp/bootstrap.sh
-      sudo DOKKU_TAG=v0.34.4 bash /tmp/bootstrap.sh
-
-      echo "Adding SSH key to Dokku"
-      echo "${ssh_key}" | dokku ssh-keys:add admin
-
-      echo "Setting up Dokku domains"
-      dokku domains:set-global ${domain}
-
-      echo "Adding Dokku plugins"
-      dokku plugin:install https://github.com/dokku/dokku-postgres.git
-      dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
-      dokku letsencrypt:cron-job --add  # To auto-renew SSL certificates
-
-      echo "Setting up lets encrypt"
-      dokku letsencrypt:set --global email "${email}"
-
-      echo "Finished Dokku setup"
-      sudo shutdown -r now
-    path: /var/lib/cloud/scripts/per-once/install.sh
-    permissions: "0755"
+ansible:
+  package_name: ansible-core
+  install_method: pip
+  pull:
+    url: "https://github.com/bengosney/hosting.git"
+    playbook_name: playbooks/pull.yml
 runcmd:
   - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
   - systemctl enable fail2ban

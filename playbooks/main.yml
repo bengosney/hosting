@@ -1,0 +1,5 @@
+---
+- hosts: webhosts
+  become: true
+  roles:
+    - server
