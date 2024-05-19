@@ -1,4 +1,87 @@
-- name: make a temp file to ensure it's working
+- name: Install required system packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - python3-certifi
+    state: latest
+    update_cache: true
+
+- name: Create directory for Docker's GPG key
   ansible.builtin.file:
-    path: /tmp/ansible_test
-    state: touch
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Docker's GPG key
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  args:
+    creates: /etc/apt/keyrings/docker.asc
+
+- name: Check permissions on the GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.asc
+    mode: '0444'
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: latest
+    update_cache: true
+
+- name: Download Dokku's GPG key
+  ansible.builtin.shell:
+    cmd: wget -qO- https://packagecloud.io/dokku/dokku/gpgkey > /etc/apt/trusted.gpg.d/dokku.asc
+  args:
+    creates: /etc/apt/trusted.gpg.d/dokku.asc
+
+- name: Check permissions on the GPG key
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/dokku.asc
+    mode: '0444'
+
+- name: Add Dokku Repository
+  apt_repository:
+    repo: deb https://packagecloud.io/dokku/dokku/ubuntu/ jammy main
+    state: present
+
+- name: Update apt and install Dokku
+  apt:
+    pkg:
+      - dokku
+    state: latest
+    update_cache: true
+
+- name: Install Dokku plugins
+  shell: dokku plugin:install {{ item.url }} {{ item.name }}
+  args:
+    creates: /var/lib/dokku/plugins/available/{{ item.name }}
+  with_items:
+    - { url: "https://github.com/dokku/dokku-letsencrypt.git", name: "letsencrypt" }
+    - { url: "https://github.com/dokku/dokku-postgres.git", name: "postgres" }
+    - { url: "https://github.com/dokku/dokku-maintenance.git", name: "maintenance" }
+    - { url: "https://github.com/dokku/dokku-redis.git", name: "redis" }
+
+## Dokku Configuration, TODO: Make these run once
+- name: Set Dokku's domain
+  shell: dokku domains:set-global flaminghedgehog.com
+
+- name: Read local SSH public key
+  set_fact:
+    ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+- name: dokku ssh-keys:add for user {{ username }}
+  shell: echo "{{ ssh_key }}" | dokku ssh-keys:add {{ username }}
+  no_log: true
