@@ -1,4 +1,4 @@
 - name: make a temp file to ensure it's working
   ansible.builtin.file:
     path: /tmp/ansible_test
-    state: file
+    state: touch
