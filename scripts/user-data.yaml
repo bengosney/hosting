@@ -7,7 +7,9 @@ users:
     ssh_authorized_keys:
       - ${ssh_key}
 cloud_final_modules:
+ - package_update_upgrade_install
  - scripts-per-once
+ - ansible
 packages:
   - openssh-server
   - fail2ban
@@ -17,8 +19,8 @@ packages:
 package_update: true
 package_upgrade: true
 ansible:
-  package_name: ansible-core
-  install_method: pip
+  package_name: ansible
+  install_method: distro
   pull:
     url: "https://github.com/bengosney/hosting.git"
     playbook_name: playbooks/pull.yml
