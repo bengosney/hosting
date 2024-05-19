@@ -34,15 +34,3 @@ resource "aws_iam_user_policy_attachment" "user_policy" {
   user       = aws_iam_user.primary.name
   policy_arn = aws_iam_policy.ses_policy.arn
 }
-
-output "SMTP_PASS" {
-  value = nonsensitive(aws_iam_access_key.access_key.ses_smtp_password_v4)
-}
-
-output "SMTP_USER" {
-  value = aws_iam_access_key.access_key.id
-}
-
-output "SMTP_HOST" {
-  value = "email-smtp.${var.aws_region}.amazonaws.com"
-}

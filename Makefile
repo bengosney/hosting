@@ -1,4 +1,4 @@
-.PHONY: help check init clean download upload
+.PHONY: help check init clean download upload ansible apply destroy plan
 .DEFAULT_GOAL: help
 .PRECIOUS: imports.tf terraform.tfvars
 
@@ -51,3 +51,18 @@ endif
 
 clean: ## Remove fetched files
 	@rm -f imports.tf terraform.tfvars
+
+apply: check .terraform ## Apply the terraform
+	$(CMD) apply
+
+destroy: check .terraform ## Destroy the terraform
+	$(CMD) destroy
+
+plan: check .terraform ## Plan the terraform
+	$(CMD) plan
+
+inventory.ini: ## Generate the inventory
+	$(CMD) output -json | jq -r '. | to_entries | map("[webservers]\n\(.value.value)") | .[]' > $@
+
+ansible: inventory.ini ## Run ansible
+	ansible-playbook -i inventory.ini playbooks/main.yml

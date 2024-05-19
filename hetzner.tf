@@ -89,3 +89,8 @@ resource "hcloud_server" "web" {
     ipv6_enabled = true
   }
 }
+
+output "server_ips" {
+  value      = hcloud_server.web.ipv4_address
+  depends_on = [hcloud_server.web]
+}
