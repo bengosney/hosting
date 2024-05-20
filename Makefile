@@ -64,5 +64,9 @@ plan: check .terraform ## Plan the terraform
 inventory.ini: ## Generate the inventory
 	$(CMD) output -json | jq -r '. | to_entries | map("[webservers]\n\(.value.value)") | .[]' > $@
 
-ansible: inventory.ini ## Run ansible
+ansible: inventory.ini playbooks/roles/server/files/id_rsa.pub ## Run ansible
 	ansible-playbook -i inventory.ini playbooks/main.yml
+
+playbooks/roles/server/files/id_rsa.pub:
+	mkdir -p $(dir $@)
+	cp ~/.ssh/id_rsa.pub $@
