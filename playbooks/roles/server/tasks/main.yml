@@ -76,7 +76,7 @@
 
 ## Dokku Configuration, TODO: Make these run once
 - name: Set Dokku's domain
-  shell: dokku domains:set-global flaminghedgehog.com
+  shell: dokku domains:set-global git.flaminghedgehog.com
 
 - name: Read local SSH public key
   set_fact:

@@ -38,6 +38,15 @@ resource "cloudflare_record" "ssh" {
   allow_overwrite = true
 }
 
+resource "cloudflare_record" "git" {
+  name            = "git"
+  proxied         = false
+  type            = "A"
+  value           = hcloud_server.web.ipv4_address
+  zone_id         = var.zoneid
+  allow_overwrite = true
+}
+
 resource "tls_private_key" "origin_cert" {
   algorithm = "RSA"
 }
