@@ -74,6 +74,19 @@
     - { url: "https://github.com/dokku/dokku-maintenance.git", name: "maintenance" }
     - { url: "https://github.com/dokku/dokku-redis.git", name: "redis" }
 
+- name: Add bash alias (user)
+  become: false
+  lineinfile:
+    path: ~/.bashrc
+    line: "alias la='ls -lAh'"
+    regexp: '^alias la='
+
+- name: Add bash alias (root)
+  lineinfile:
+    path: ~/.bashrc
+    line: "alias la='ls -lAh'"
+    regexp: '^alias la='
+
 ## Dokku Configuration, TODO: Make these run once
 - name: Set Dokku's domain
   shell: dokku domains:set-global git.flaminghedgehog.com
