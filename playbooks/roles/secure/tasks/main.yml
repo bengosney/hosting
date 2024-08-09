@@ -1,0 +1,32 @@
+- name: disable ssh key auth
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^PasswordAuthentication
+    line: PasswordAuthentication no
+  notify:
+    restart ssh
+
+- name: install fail2ban
+  apt:
+    name: fail2ban
+    state: latest
+    update_cache: true
+  notify:
+    restart fail2ban
+
+- name: remove default fail2ban config
+  ansible.builtin.file:
+    state: absent
+    path: /etc/fail2ban/jail.d/defaults-debian.conf
+  notify:
+    restart fail2ban
+
+- name: copy fail2ban local config
+  ansible.builtin.template:
+    src: fail2ban/jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    restart fail2ban
