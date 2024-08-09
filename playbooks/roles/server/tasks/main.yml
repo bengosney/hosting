@@ -87,6 +87,14 @@
     line: "alias la='ls -lAh'"
     regexp: '^alias la='
 
+- name: disable ssh key auth
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: ^PasswordAuthentication
+    line: PasswordAuthentication no
+  notify:
+    restart ssh
+
 ## Dokku Configuration
 - name: Get Dokku global domain
   ansible.builtin.shell:

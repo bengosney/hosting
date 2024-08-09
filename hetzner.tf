@@ -47,7 +47,8 @@ resource "hcloud_firewall" "webfirewall" {
     protocol  = "tcp"
     port      = "22"
     source_ips = [
-      "84.92.61.77/32",
+      "0.0.0.0/0",
+      "::/0"
     ]
   }
 }
