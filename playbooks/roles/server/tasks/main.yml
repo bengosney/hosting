@@ -6,7 +6,6 @@
       - curl
       - python3-certifi
     state: latest
-    update_cache: true
 
 - name: Create directory for Docker's GPG key
   ansible.builtin.file:
@@ -39,7 +38,6 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: latest
-    update_cache: true
 
 - name: Download Dokku's GPG key
   ansible.builtin.shell:
@@ -62,7 +60,6 @@
     pkg:
       - dokku
     state: latest
-    update_cache: true
 
 - name: Install Dokku plugins
   shell: dokku plugin:install {{ item.url }} {{ item.name }}
@@ -103,3 +100,16 @@
   register: ssh_key_add
   changed_when: ssh_key_add.rc == 0
   failed_when: false
+
+- name: Get Dokku Plugin List
+  shell: dokku plugin:list
+  register: dokku_plugins
+  changed_when: false
+
+- name: Dokku Postgres
+  shell: dokku plugin:install https://github.com/dokku/dokku-postgres.git postgres
+  when: "'postgres' not in dokku_plugins.stdout"
+
+- name: Dokku CouchDB
+  shell: dokku plugin:install https://github.com/dokku/dokku-couchdb.git couchdb
+  when: "'couchdb' not in dokku_plugins.stdout"
