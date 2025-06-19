@@ -49,6 +49,11 @@ ifndef TERAFORM_BUCKET_PATH
 	$(error "TERAFORM_BUCKET_PATH is required!")
 endif
 
+check_jq:
+	@if ! command -v jq >/dev/null 2>&1; then \
+		echo "jq is not installed!"; exit 1; \
+	fi
+
 clean: ## Remove fetched files
 	@rm -f imports.tf terraform.tfvars
 
@@ -64,7 +69,7 @@ plan: check .terraform ## Plan the terraform
 inventory.ini: ## Generate the inventory
 	$(CMD) output -json | jq -r '. | to_entries | map("[webservers]\n\(.value.value)") | .[]' > $@
 
-ansible: inventory.ini playbooks/roles/server/files/id_rsa.pub ## Run ansible
+ansible: inventory.ini playbooks/roles/server/files/id_rsa.pub check_jq ## Run ansible
 	ansible-playbook -i inventory.ini playbooks/main.yml
 
 playbooks/roles/server/files/id_rsa.pub:
