@@ -15,7 +15,7 @@ resource "cloudflare_record" "dokku-ipv6" {
   name            = "@"
   proxied         = true
   type            = "AAAA"
-  value           = hcloud_server.web.ipv6_address
+  content         = hcloud_server.web.ipv6_address
   zone_id         = var.zoneid
   allow_overwrite = true
 }
@@ -24,7 +24,7 @@ resource "cloudflare_record" "dokku-ipv4" {
   name            = "@"
   proxied         = true
   type            = "A"
-  value           = hcloud_server.web.ipv4_address
+  content         = hcloud_server.web.ipv4_address
   zone_id         = var.zoneid
   allow_overwrite = true
 }
@@ -33,7 +33,7 @@ resource "cloudflare_record" "ssh" {
   name            = "ssh"
   proxied         = false
   type            = "A"
-  value           = hcloud_server.web.ipv4_address
+  content         = hcloud_server.web.ipv4_address
   zone_id         = var.zoneid
   allow_overwrite = true
 }
@@ -42,7 +42,7 @@ resource "cloudflare_record" "git" {
   name            = "git"
   proxied         = false
   type            = "A"
-  value           = hcloud_server.web.ipv4_address
+  content         = hcloud_server.web.ipv4_address
   zone_id         = var.zoneid
   allow_overwrite = true
 }
@@ -73,7 +73,7 @@ resource "cloudflare_record" "cname_dkim" {
 
   zone_id         = var.zoneid
   name            = "${aws_sesv2_email_identity.email.dkim_signing_attributes[0].tokens[count.index]}._domainkey.${var.domain}"
-  value           = "${aws_sesv2_email_identity.email.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"
+  content         = "${aws_sesv2_email_identity.email.dkim_signing_attributes[0].tokens[count.index]}.dkim.amazonses.com"
   type            = "CNAME"
   proxied         = false
   comment         = "DKIM ${count.index} - SES"
