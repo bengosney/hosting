@@ -7,6 +7,22 @@
       - python3-certifi
     state: latest
 
+- name: Stop and disable Nginx service
+  ansible.builtin.systemd:
+    name: nginx
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  ignore_errors: yes
+
+- name: Remove Nginx package
+  ansible.builtin.apt:
+    name: nginx
+    state: absent
+    purge: yes
+    autoremove: yes
+  #ignore_errors: yes # Ignore errors if Nginx package is not installed
+
 - name: Create directory for Docker's GPG key
   ansible.builtin.file:
     path: /etc/apt/keyrings
