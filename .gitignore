@@ -64,3 +64,4 @@ terraform.rc
 
 *.lock.hcl
 inventory.ini
+tf_outputs.json

@@ -1,0 +1,35 @@
+---
+- name: Set AWS credentials from Terraform outputs
+  hosts: webservers
+  user: devops
+  vars:
+    aws_region: "eu-west-1"
+  tasks:
+    - name: Read Terraform outputs
+      set_fact:
+        tf_outputs: "{{ lookup('file', '../tf_outputs.json') | from_json }}"
+
+    - name: Set AWS credentials as facts
+      set_fact:
+        aws_access_key_id: "{{ tf_outputs.sql_backup_access_key_id.value }}"
+        aws_secret_access_key: "{{ tf_outputs.sql_backup_secret_access_key.value }}"
+
+    - name: Ensure ~/.aws directory exists
+      file:
+        path: "/home/{{ ansible_user }}/.aws"
+        state: directory
+        mode: '0700'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Write AWS credentials file
+      copy:
+        dest: "/home/{{ ansible_user }}/.aws/credentials"
+        content: |
+          [default]
+          aws_access_key_id={{ aws_access_key_id }}
+          aws_secret_access_key={{ aws_secret_access_key }}
+          region={{ aws_region }}
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'

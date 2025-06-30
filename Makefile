@@ -75,3 +75,9 @@ ansible: inventory.ini playbooks/roles/server/files/id_rsa.pub check_jq ## Run a
 playbooks/roles/server/files/id_rsa.pub:
 	mkdir -p $(dir $@)
 	cp ~/.ssh/id_rsa.pub $@
+
+tf_outputs.json:
+	$(CMD) output -json > $@
+
+post-setup: tf_outputs.json inventory.ini playbooks/roles/server/files/id_rsa.pub ## Run post playbook
+	ansible-playbook -i inventory.ini playbooks/post.yml
