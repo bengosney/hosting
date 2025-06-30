@@ -1,0 +1,34 @@
+#!/bin/bash
+
+CMD=$(which tofu || which terraform)
+
+if [ -z "$CMD" ]; then
+  echo "Error: Neither tofu nor terraform found in PATH."
+  exit 1
+fi
+
+TF_OUTPUT=$($CMD output -json)
+
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to get Terraform outputs."
+  exit 1
+fi
+
+AWS_ACCESS_KEY_ID=$(echo "$TF_OUTPUT" | jq -r .sql_backup_access_key_id.value)
+AWS_SECRET_ACCESS_KEY=$(echo "$TF_OUTPUT" | jq -r .sql_backup_secret_access_key.value)
+AWS_BUCKET_NAME=$(echo "$TF_OUTPUT" | jq -r .sql_backup_bucket_name.value)
+AWS_DEFAULT_REGION="eu-west-1"
+
+DOMAIN=$(grep -E '^domain[[:space:]]*=' terraform.tfvars | awk -F= '{gsub(/[[:space:]]*/, "", $2); gsub(/"/, "", $2); print $2}')
+
+DOKKU="ssh dokku@ssh.${DOMAIN}"
+
+APP_LIST=$(${DOKKU} postgres:list | grep -v ===)
+for APP in $APP_LIST; do
+  CRON_MINUTE=$((RANDOM % 60))
+  echo "Scheduling backup for app: ${APP} at minute ${CRON_MINUTE}"
+  ${DOKKU} postgres:backup-auth api ${APP} ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} ${AWS_DEFAULT_REGION}
+  ${DOKKU} postgres:backup-schedule ${APP} "${CRON_MINUTE} 3 * * *" ${AWS_BUCKET_NAME}
+done
+
+echo "Done."
